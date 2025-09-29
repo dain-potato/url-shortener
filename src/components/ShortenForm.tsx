@@ -12,7 +12,7 @@ export default function ShortenForm() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const apiBase: string = import.meta.env.VITE_APP_URL || '';
+    // const apiBase: string = import.meta.env.VITE_APP_URL || '';
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -25,10 +25,10 @@ export default function ShortenForm() {
 
         setLoading(true);
         try {
-            const res = await fetch((apiBase ? apiBase : '') + '/api/shorten', {
+            const res = await fetch('/api/shorten', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: longUrl }),
+                body: JSON.stringify({ longUrl }),
             });
 
             if (!res.ok) { 
