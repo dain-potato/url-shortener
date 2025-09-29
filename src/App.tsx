@@ -2,9 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import ShortenForm from './components/ShortenForm';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-100 p-6'>
       <div className='w-full max-w-2xl p-8 bg-white rounded-lg shadow'>
@@ -14,5 +12,3 @@ function App() {
     </div>
   );
 }
-
-export default App
