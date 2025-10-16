@@ -1,21 +1,28 @@
-// api/[code].ts
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import clientPromise from "./lib/mongodb";
 
-// We need the same in-memory object to read URLs.
-// Since serverless functions don’t share memory between files, 
-// we need to export/import it, or make it a module-level object.
-// For simplicity, we can define it again, but links only work per instance.
-const urlDatabase: Record<string, string> = {};
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const { code } = req.query;
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
-  const code = req.query.code as string;
-  if (!code) return res.status(400).send('Missing code');
+  if (!code || typeof code !== "string") {
+    return res.status(400).send("Missing or invalid code");
+  }
 
-  const longUrl = urlDatabase[code];
-  if (longUrl) {
-    res.writeHead(302, { Location: longUrl });
-    res.end();
-  } else {
-    res.status(404).send('URL not found');
+  try {
+    const client = await clientPromise;
+    const db = client.db(process.env.MONGODB_DB);
+    const urls = db.collection("urls");
+
+    const record = await urls.findOne({ shortCode: code });
+
+    if (record && record.longUrl) {
+      res.writeHead(302, { Location: record.longUrl });
+      res.end();
+    } else {
+      res.status(404).send("URL not found");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 }
